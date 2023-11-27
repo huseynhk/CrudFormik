@@ -27,7 +27,7 @@ const AddUser = () => {
       setNewUser(initialState);
       setTimeout(() => {
         navigate(ROUTER.Home);
-      }, 1500);
+      }, 1250);
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error("Error adding user. Please try again.", {

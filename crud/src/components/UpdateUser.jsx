@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ROUTER } from "../constant/Router";
 import { Button } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { useGlobalContext } from "../contexts/GlobalContext";
+import { getSingleUser, updateUser } from "../services/user";
+import useAxios from "../hooks/useAxios";
 
 const initialState = {
   fullName: "",
@@ -13,25 +14,41 @@ const initialState = {
 };
 
 const UpdateUser = () => {
-  const { inputRef, setFocus } = useGlobalContext();
   const [editedUser, setEditedUser] = useState(initialState);
   const { userId } = useParams();
   const navigate = useNavigate();
 
-  const fetchUser = async () => {
-    // const response = await GetSingleUser(userId);
-    setEditedUser(response);
+  const { loading, error } = useAxios({
+    requestFn: () => getSingleUser(userId),
+  });
+  
+  const fetchUserData = async () => {
+    try {
+      const response = await getSingleUser(userId);
+      setEditedUser(response?.data || initialState);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
+  useEffect(() => {
+    fetchUserData();
+  }, [userId]);
+
   const handleEditUser = async () => {
-    await EditUsers(userId, editedUser);
-    // setEditedUser(initialState);
-    toast.success("User added successfully!", {
-      autoClose: 1000,
-    });
-    setTimeout(() => {
+    try {
+      await updateUser(userId, editedUser);
+      toast.success("User updated successfully!", {
+        autoClose: 1000,
+      });
       navigate(ROUTER.Home);
-    }, 1500);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Error updating user. Please try again.", {
+        autoClose: 1000,
+      });
+    }
   };
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setEditedUser({
@@ -40,10 +57,13 @@ const UpdateUser = () => {
     });
   };
 
-  useEffect(() => {
-    fetchUser();
-    setFocus();
-  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="d-flex justify-content-center align-items-center flex-column ">
@@ -57,7 +77,6 @@ const UpdateUser = () => {
             value={editedUser.fullName}
             onChange={handleInputChange}
             className="p-2 w-75 my-2 border border-primary rounded"
-            ref={inputRef}
           />
         </div>
         <div>

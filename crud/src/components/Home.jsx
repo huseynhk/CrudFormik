@@ -20,21 +20,25 @@ const Home = () => {
     handleSortUsers,
   } = useGlobalContext();
 
+  const updateUsers = async () => {
+    try {
+      const res = await getUsers();
+      setUsers(res?.data.filter((item) => item.id > 100));
+    } catch (error) {
+      console.error("Error updating users:", error);
+    }
+  };
 
+  
   const { loading } = useAxios({
     requestFn: getUsers,
-    onSuccess: (res) => {
-      const filteredUsers = res?.data.filter((item) => item.id > 100);
-      setUsers(filteredUsers);
-    },
+    onSuccess: () => updateUsers(),
   });
 
   const deleteUser = async (userId) => {
     try {
       await removeUser(userId);
-      const res = await getUsers();
-      const filteredUsers = res?.data.filter((item) => item.id > 100);
-      setUsers(filteredUsers);
+      await updateUsers();
       toast.success("User deleted successfully!", {
         autoClose: 1000,
       });
@@ -46,17 +50,15 @@ const Home = () => {
 
   const resetSortedData = async () => {
     try {
-      const res = await getUsers();
-      const filteredUsers = res?.data.filter((item) => item.id > 100);
-      setUsers(filteredUsers);
+      await updateUsers();
     } catch (error) {
       console.error("Error resetting sorted data:", error);
     }
   };
 
   useEffect(() => {
-    getUsers();
-  }, [isModalOpen, setUsers]);
+    updateUsers();
+  }, [isModalOpen]);
 
   return (
     <>
@@ -64,7 +66,7 @@ const Home = () => {
         <h1 className="text-white mt-2">User List</h1>
         <div className="d-flex justify-content-center align-items-center my-3">
           <select
-            className="px-6 py-2 rounded bg-dark-subtle "
+            className="px-6 py-2 rounded bg-info-subtle "
             onChange={handleSortUsers}
           >
             <option value="A-Z">A-Z Fullname</option>

@@ -5,41 +5,41 @@ const useAxios = ({ requestFn, onSuccess, onError }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // const handleRequestData = async () => {
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await requestFn();
-  //     setData(res);
-  //     onSuccess?.(res);
-  //   } catch (err) {
-  //     setError(err);
-  //     onError?.(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const handleRequestData = () => {
+  const handleRequestData = async () => {
     setLoading(true);
-    requestFn()
-      .then((res) => {
-        setData(res);
-        onSuccess?.(res);
-      })
-      .catch((err) => {
-        setError(err);
-        onError?.(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+
+    try {
+      const res = await requestFn();
+      setData(res);
+      onSuccess?.(res);
+    } catch (err) {
+      setError(err);
+      onError?.(err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // const handleRequestData = () => {
+  //   setLoading(true);
+  //   requestFn()
+  //     .then((res) => {
+  //       setData(res);
+  //       onSuccess?.(res);
+  //     })
+  //     .catch((err) => {
+  //       setError(err);
+  //       onError?.(err);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // };
 
   useEffect(() => {
     handleRequestData();
 
-    console.log("working....");
+    console.log("good....");
   }, []);
 
   return { data, error, loading };

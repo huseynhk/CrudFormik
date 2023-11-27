@@ -1,19 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { Card, Container, Row, Col } from "react-bootstrap";
+import { getSingleUser } from "../services/user";
+import useAxios from "../hooks/useAxios";
 
 const Detail = () => {
-  const [user, setUser] = useState("");
   const { userId } = useParams();
 
-  const fetchUser = async () => {
-    // const response = await GetSingleUser(userId);
-    setUser(response);
-  };
+  const {
+    data: responseData,
+    loading,
+    error,
+  } = useAxios({
+    requestFn: () => getSingleUser(userId),
+  });
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const user = responseData?.data || {};
+
+  if (!user) {
+    return <div>No user data available.</div>;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>

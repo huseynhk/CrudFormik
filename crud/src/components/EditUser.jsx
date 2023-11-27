@@ -1,11 +1,20 @@
 import React, { useState } from "react";
-
+import { updateUser } from "../services/user";
 import { Modal, Form, Button } from "react-bootstrap";
 import { useGlobalContext } from "../contexts/GlobalContext";
+import { toast } from "react-toastify";
 
 const EditUser = () => {
   const { isModalOpen, editedItem, closeModal } = useGlobalContext();
   const [editedUser, setEditedUser] = useState(editedItem);
+
+  const editUser = async () => {
+    await updateUser(editedUser.id, editedUser);
+    closeModal();
+    toast.success("User updated successfully!", {
+      autoClose: 1000,
+    });
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -14,12 +23,6 @@ const EditUser = () => {
       [name]: value,
     });
   };
-
-  const updateUser = async () => {
-    // await EditUsers(editedUser.id, editedUser);
-    closeModal();
-  };
-
   return (
     <div>
       <Modal show={isModalOpen} onHide={closeModal}>
@@ -69,7 +72,7 @@ const EditUser = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-center align-items-center">
-          <Button variant="primary" className="py-2 px-5" onClick={updateUser}>
+          <Button variant="primary" className="py-2 px-5" onClick={editUser}>
             Save User
           </Button>
         </Modal.Footer>

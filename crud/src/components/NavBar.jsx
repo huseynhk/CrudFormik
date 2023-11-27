@@ -1,10 +1,13 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROUTER } from "../constant/Router";
 import { activeLink } from "../utils/ActiveLink";
+import { Button } from "react-bootstrap";
 
 const NavBar = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const isPage = activeLink(ROUTER.Home, pathname);
 
   return (
     <>
@@ -30,6 +33,15 @@ const NavBar = () => {
               >
                 Add User
               </Link>
+            </li>
+            <li className="nav-item mt-1">
+              <Button
+                size="sm"
+                className="px-5 py-1 btn-warning fs-4"
+                onClick={() => navigate(isPage ? ROUTER.AddUser : ROUTER.Home)}
+              >
+                {isPage ? "Table" : "Add User"}
+              </Button>
             </li>
           </ul>
         </div>
