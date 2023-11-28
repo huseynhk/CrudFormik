@@ -1,31 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTER } from "../constant/Router";
-import { Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { getSingleUser, updateUser } from "../services/user";
-import useAxios from "../hooks/useAxios";
+import { useFormik } from "formik";
 
-const initialState = {
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+const initialValues = {
   fullName: "",
   age: 0,
   email: "",
   position: "",
 };
+const validate = (values) => {
+  let errors = {};
+  if (!values.fullName) {
+    errors.fullName = "Required";
+  } else if (values.fullName.length < 5) {
+    errors.name = "Must be 5 characters or less";
+  } else if (values.fullName.length > 20) {
+    errors.name = "Must be 20 characters or less";
+  }
+
+  if (!values.email) {
+    errors.email = "Required";
+  } else if (!emailRegex.test(values.email)) {
+    errors.email = "Invalid email address";
+  }
+
+  if (!values.position) {
+    errors.position = "Required";
+  }
+
+  if (!values.age) {
+    errors.age = "Required";
+  }
+
+  return errors;
+};
 
 const UpdateUser = () => {
-  const [editedUser, setEditedUser] = useState(initialState);
   const { userId } = useParams();
   const navigate = useNavigate();
 
-  const { loading, error } = useAxios({
-    requestFn: () => getSingleUser(userId),
-  });
-  
   const fetchUserData = async () => {
     try {
       const response = await getSingleUser(userId);
-      setEditedUser(response?.data || initialState);
+      formik.setValues(response?.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -34,9 +55,9 @@ const UpdateUser = () => {
     fetchUserData();
   }, [userId]);
 
-  const handleEditUser = async () => {
+  const onSubmit = async (values) => {
     try {
-      await updateUser(userId, editedUser);
+      await updateUser(userId, values);
       toast.success("User updated successfully!", {
         autoClose: 1000,
       });
@@ -49,71 +70,87 @@ const UpdateUser = () => {
     }
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setEditedUser({
-      ...editedUser,
-      [name]: value,
-    });
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  const formik = useFormik({
+    initialValues,
+    onSubmit,
+    validate,
+  });
+  const disableBtn = !!Object.values(formik.errors).length;
 
   return (
     <div className="d-flex justify-content-center align-items-center flex-column ">
       <h1 className="text-white my-4">Edit User</h1>
-      <div className="bg-dark-subtle w-50 text-center rounded  border border-primary">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="bg-dark-subtle w-50 text-center rounded  border border-primary"
+      >
         <div>
           <input
             type="text"
             placeholder="Full Name"
             name="fullName"
-            value={editedUser.fullName}
-            onChange={handleInputChange}
+            value={formik.values.fullName}
+            onChange={formik.handleChange}
             className="p-2 w-75 my-2 border border-primary rounded"
           />
+          {formik.errors.fullName && (
+            <p className="text-danger fw-bold fs-4 mb-0">
+              {formik.errors.fullName}
+            </p>
+          )}
         </div>
         <div>
           <input
             type="email"
             placeholder="Email"
             name="email"
-            value={editedUser.email}
-            onChange={handleInputChange}
+            value={formik.values.email}
+            onChange={formik.handleChange}
             className="p-2 w-75 my-1 border border-primary rounded"
           />
+          {formik.errors.email && (
+            <p className="text-danger fw-bold fs-4 mb-0">
+              {formik.errors.email}
+            </p>
+          )}
         </div>
         <div>
           <input
             type="text"
             placeholder="Position"
             name="position"
-            value={editedUser.position}
-            onChange={handleInputChange}
+            value={formik.values.position}
+            onChange={formik.handleChange}
             className="p-2 w-75 my-1 border border-primary rounded"
           />
+          {formik.errors.position && (
+            <p className="text-danger fw-bold fs-4 mb-0">
+              {formik.errors.position}
+            </p>
+          )}
         </div>
         <div>
           <input
             type="number"
             placeholder="Age"
             name="age"
-            value={editedUser.age}
-            onChange={handleInputChange}
+            value={formik.values.age}
+            onChange={formik.handleChange}
             className="p-2 w-75 my-1 border border-primary rounded"
           />
+          {formik.errors.age && (
+            <p className="text-danger fw-bold fs-4 mb-0">{formik.errors.age}</p>
+          )}
         </div>
 
-        <Button className="m-2 px-4" onClick={handleEditUser}>
+        <button
+          className="btn btn-primary rounded my-3 px-5 py-2 fs-5 "
+          type="submit"
+          disabled={disableBtn}
+        >
           Edit User
-        </Button>
-      </div>
+        </button>
+      </form>
     </div>
   );
 };
