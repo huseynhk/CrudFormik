@@ -31,14 +31,14 @@ const Detail = () => {
 
   return (
     <div>
-      <Container className="mt-4 fs-1">
+      <Container className="mt-4 fs-2">
         <Row className="justify-content-center">
           <Col xs={12} md={10} lg={8}>
             <Card>
               <Card.Body>
                 <Card.Text>
                   <div className="d-flex justify-content-center align-items-center flex-column">
-                    <Card.Title className="mb-2 text-muted fs-3">
+                    <Card.Title className="mb-2 text-muted fs-1 fw-bold ">
                       User Datas
                     </Card.Title>
 

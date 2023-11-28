@@ -11,7 +11,7 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary py-3">
+      <nav className="navbar navbar-expand-lg bg-body-tertiary p-3">
         <div className="container-fluid">
           <ul className="navbar-nav mx-auto  mb-2 mb-lg-0">
             <li className="nav-item ">

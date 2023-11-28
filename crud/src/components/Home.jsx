@@ -89,9 +89,9 @@ const Home = () => {
               <th>S.No</th>
               <th>FullName</th>
               <th>Age</th>
-              <th>Email</th>
+              <th>Email Address</th>
               <th>Position</th>
-              <th>Update</th>
+              <th>Updates</th>
               <th>Actions</th>
             </tr>
           </thead>

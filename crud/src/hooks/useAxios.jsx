@@ -20,21 +20,6 @@ const useAxios = ({ requestFn, onSuccess, onError }) => {
     }
   };
 
-  // const handleRequestData = () => {
-  //   setLoading(true);
-  //   requestFn()
-  //     .then((res) => {
-  //       setData(res);
-  //       onSuccess?.(res);
-  //     })
-  //     .catch((err) => {
-  //       setError(err);
-  //       onError?.(err);
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // };
 
   useEffect(() => {
     handleRequestData();

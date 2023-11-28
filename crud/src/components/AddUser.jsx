@@ -16,9 +16,9 @@ const initialValues = {
 const validate = (values) => {
   let errors = {};
   if (!values.fullName) {
-    errors.fullName = "Required";
-  } else if (values.fullName.length < 5) {
-    errors.name = "Must be 5 characters or less";
+    errors.fullName = "Must be between 3 and 20 characters";
+  } else if (values.fullName.length < 3) {
+    errors.name = "Must be 3 characters or less";
   } else if (values.fullName.length > 20) {
     errors.name = "Must be 20 characters or less";
   }
