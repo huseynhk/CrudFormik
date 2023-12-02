@@ -6,11 +6,14 @@ import { getSingleUser, updateUser } from "../services/user";
 import { useFormik } from "formik";
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+const phoneRegex = /^(\+994|0)(50|51|55|70|77|99)([0-9]{7})$/;
+
 const initialValues = {
   fullName: "",
   age: 0,
   email: "",
   position: "",
+  phone: "",
 };
 const validate = (values) => {
   let errors = {};
@@ -26,6 +29,11 @@ const validate = (values) => {
     errors.email = "Required";
   } else if (!emailRegex.test(values.email)) {
     errors.email = "Invalid email address";
+  }
+  if (!values.phone) {
+    errors.phone = "Required";
+  } else if (!phoneRegex.test(values.phone)) {
+    errors.phone = "Invalid phone number";
   }
 
   if (!values.position) {
@@ -52,13 +60,11 @@ const UpdateUser = () => {
     }
   }, [userId]);
 
-
-
   useEffect(() => {
     fetchUserData();
   }, [userId]);
 
-  const onSubmit =  async (values) => {
+  const onSubmit = async (values) => {
     try {
       await updateUser(userId, values);
       toast.success("User updated successfully!", {
@@ -114,6 +120,22 @@ const UpdateUser = () => {
           {formik.errors.email && (
             <p className="text-danger fw-bold fs-4 mb-0">
               {formik.errors.email}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="phone"
+            placeholder="Phone"
+            name="phone"
+            value={formik.values.phone}
+            onChange={formik.handleChange}
+            className="p-2 w-75 my-1 border border-primary rounded"
+          />
+          {formik.errors.phone && (
+            <p className="text-danger fw-bold fs-4 mb-0">
+              {formik.errors.phone}
             </p>
           )}
         </div>

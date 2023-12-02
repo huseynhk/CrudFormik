@@ -51,6 +51,16 @@ const EditUser = () => {
             </Form.Group>
 
             <Form.Group>
+              <Form.Label>Phone</Form.Label>
+              <Form.Control
+                type="phone"
+                name="phone"
+                value={editedUser.phone}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+
+            <Form.Group>
               <Form.Label>Position</Form.Label>
               <Form.Control
                 type="text"

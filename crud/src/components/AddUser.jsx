@@ -42,9 +42,7 @@ const validate = (values) => {
   if (!values.age) {
     errors.age = "Required";
   }
-  if (!values.image) {
-    errors.image = "Required";
-  }
+
 
   return errors;
 };
