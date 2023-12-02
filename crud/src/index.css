@@ -32,3 +32,10 @@ a {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+img {
+  width: 75px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 10px;
+}

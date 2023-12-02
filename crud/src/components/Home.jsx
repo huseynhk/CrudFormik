@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import EditUser from "./EditUser";
 import { Link } from "react-router-dom";
 import { ROUTER } from "../constant/Router";
@@ -20,41 +20,43 @@ const Home = () => {
     handleSortUsers,
   } = useGlobalContext();
 
-  const updateUsers = async () => {
+  const updateUsers = useCallback(async () => {
     try {
       const res = await getUsers();
       setUsers(res?.data.filter((item) => item.id > 100));
     } catch (error) {
       console.error("Error updating users:", error);
     }
-  };
+  }, [setUsers]);
 
-  
   const { loading } = useAxios({
     requestFn: getUsers,
     onSuccess: () => updateUsers(),
   });
 
-  const deleteUser = async (userId) => {
-    try {
-      await removeUser(userId);
-      await updateUsers();
-      toast.success("User deleted successfully!", {
-        autoClose: 1000,
-      });
-      closeDeleteModal();
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  };
+  const deleteUser = useCallback(
+    async (userId) => {
+      try {
+        await removeUser(userId);
+        await updateUsers();
+        toast.success("User deleted successfully!", {
+          autoClose: 1000,
+        });
+        closeDeleteModal();
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    },
+    [updateUsers, closeDeleteModal]
+  );
 
-  const resetSortedData = async () => {
+  const resetSortedData = useCallback( async () => {
     try {
       await updateUsers();
     } catch (error) {
       console.error("Error resetting sorted data:", error);
     }
-  };
+  },[updateUsers])
 
   useEffect(() => {
     updateUsers();
@@ -91,6 +93,7 @@ const Home = () => {
               <th>Age</th>
               <th>Email Address</th>
               <th>Position</th>
+              <th>Phone</th>
               <th>Updates</th>
               <th>Actions</th>
             </tr>
@@ -104,6 +107,7 @@ const Home = () => {
                   <td>{user.age}</td>
                   <td>{user.email}</td>
                   <td>{user.position}</td>
+                  <td>{user.phone}</td>
                   <td>
                     <button
                       className="btn btn-primary me-2"

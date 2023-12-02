@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTER } from "../constant/Router";
 import { toast } from "react-toastify";
@@ -43,19 +43,22 @@ const UpdateUser = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await getSingleUser(userId);
       formik.setValues(response?.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-  };
+  }, [userId]);
+
+
+
   useEffect(() => {
     fetchUserData();
   }, [userId]);
 
-  const onSubmit = async (values) => {
+  const onSubmit =  async (values) => {
     try {
       await updateUser(userId, values);
       toast.success("User updated successfully!", {
