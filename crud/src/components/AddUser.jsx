@@ -5,16 +5,10 @@ import { toast } from "react-toastify";
 import { useGlobalContext } from "../contexts/GlobalContext";
 import { addUser } from "../services/user";
 import { useFormik } from "formik";
+import { useMutate } from "../hooks/useMutate";
+import moment from "moment";
+import { isValidEmail, isValidPhone } from "../utils/ValidRegex";
 
-const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-const phoneRegex = /^(\+994|0)(50|51|55|70|77|99)([0-9]{7})$/;
-const initialValues = {
-  fullName: "",
-  age: 0,
-  email: "",
-  position: "",
-  phone: "",
-};
 const validate = (values) => {
   let errors = {};
   if (!values.fullName) {
@@ -27,12 +21,12 @@ const validate = (values) => {
 
   if (!values.email) {
     errors.email = "Required";
-  } else if (!emailRegex.test(values.email)) {
+  } else if (!isValidEmail(values.email)) {
     errors.email = "Invalid email address";
   }
   if (!values.phone) {
     errors.phone = "Required";
-  } else if (!phoneRegex.test(values.phone)) {
+  } else if (!isValidPhone(values.phone)) {
     errors.phone = "Invalid phone number";
   }
   if (!values.position) {
@@ -43,7 +37,6 @@ const validate = (values) => {
     errors.age = "Required";
   }
 
-
   return errors;
 };
 
@@ -51,9 +44,10 @@ const AddUser = () => {
   const { inputRef, setFocus } = useGlobalContext();
   const navigate = useNavigate();
 
-  const onSubmit = async (values) => {
-    try {
-      await addUser(values);
+  const { mutate, loading } = useMutate({
+    // requestFn: (values) => addUser(values),
+    requestFn: addUser,
+    onSuccess: () => {
       toast.success("User added successfully!", {
         autoClose: 1000,
       });
@@ -61,16 +55,46 @@ const AddUser = () => {
       setTimeout(() => {
         navigate(ROUTER.Home);
       }, 1250);
-    } catch (error) {
-      console.error("Error adding user:", error);
+    },
+    onError: (err) => {
+      console.error("Error adding user:", err);
       toast.error("Error adding user. Please try again.", {
         autoClose: 1000,
       });
-    }
+    },
+  });
+
+  const onSubmit = (values) => {
+    mutate(values);
   };
 
+  // const onSubmit = async (values) => {
+  //   try {
+  //     await addUser(values);
+  //     toast.success("User added successfully!", {
+  //       autoClose: 1000,
+  //     });
+  //     formik.resetForm();
+  //     setTimeout(() => {
+  //       navigate(ROUTER.Home);
+  //     }, 1250);
+  //   } catch (error) {
+  //     console.error("Error adding user:", error);
+  //     toast.error("Error adding user. Please try again.", {
+  //       autoClose: 1000,
+  //     });
+  //   }
+  // };
+  const createDate = moment().valueOf();
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      fullName: "",
+      age: 0,
+      email: "",
+      position: "",
+      phone: "",
+      create_at: createDate,
+    },
     onSubmit,
     validate,
   });
@@ -168,13 +192,13 @@ const AddUser = () => {
               </p>
             )}
           </div>
-     
+
           <button
             className="btn btn-primary rounded my-3 px-5 py-2 fs-5 "
             type="submit"
-            disabled={disableBtn}
+            disabled={disableBtn || loading}
           >
-            Add User
+            {loading ? "Adding User..." : "Add User"}
           </button>
         </form>
       </div>

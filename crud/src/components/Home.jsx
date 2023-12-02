@@ -7,6 +7,7 @@ import { useGlobalContext } from "../contexts/GlobalContext";
 import DeleteModal from "./DeleteModal";
 import useAxios from "../hooks/useAxios";
 import { getUsers, removeUser } from "../services/user";
+import moment from "moment";
 
 const Home = () => {
   const {
@@ -50,13 +51,13 @@ const Home = () => {
     [updateUsers, closeDeleteModal]
   );
 
-  const resetSortedData = useCallback( async () => {
+  const resetSortedData = useCallback(async () => {
     try {
       await updateUsers();
     } catch (error) {
       console.error("Error resetting sorted data:", error);
     }
-  },[updateUsers])
+  }, [updateUsers]);
 
   useEffect(() => {
     updateUsers();
@@ -85,7 +86,7 @@ const Home = () => {
           </button>
         </div>
 
-        <table className="table table-striped  w-75 fs-4">
+        <table className="table table-striped  w-75 fs-5">
           <thead>
             <tr>
               <th>S.No</th>
@@ -94,6 +95,7 @@ const Home = () => {
               <th>Email Address</th>
               <th>Position</th>
               <th>Phone</th>
+              <th>Added_Time</th>
               <th>Updates</th>
               <th>Actions</th>
             </tr>
@@ -108,9 +110,11 @@ const Home = () => {
                   <td>{user.email}</td>
                   <td>{user.position}</td>
                   <td>{user.phone}</td>
+                  <td>{moment(user?.create_at).fromNow()}</td>
+          
                   <td>
                     <button
-                      className="btn btn-primary me-2"
+                      className="btn btn-primary me-1"
                       onClick={() => openModal(user)}
                     >
                       Modal
@@ -124,7 +128,7 @@ const Home = () => {
                   </td>
                   <td>
                     <button
-                      className="btn btn-danger me-2"
+                      className="btn btn-danger me-1"
                       onClick={() => openDeleteModal(user)}
                     >
                       Delete
@@ -136,6 +140,7 @@ const Home = () => {
                       Info
                     </Link>
                   </td>
+                
                 </tr>
               ))
             ) : (

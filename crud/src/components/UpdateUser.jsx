@@ -4,9 +4,8 @@ import { ROUTER } from "../constant/Router";
 import { toast } from "react-toastify";
 import { getSingleUser, updateUser } from "../services/user";
 import { useFormik } from "formik";
-
-const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-const phoneRegex = /^(\+994|0)(50|51|55|70|77|99)([0-9]{7})$/;
+import { useMutate } from "../hooks/useMutate";
+import { isValidEmail, isValidPhone } from "../utils/ValidRegex";
 
 const initialValues = {
   fullName: "",
@@ -27,12 +26,12 @@ const validate = (values) => {
 
   if (!values.email) {
     errors.email = "Required";
-  } else if (!emailRegex.test(values.email)) {
+  } else if (!isValidEmail(values.email)) {
     errors.email = "Invalid email address";
   }
   if (!values.phone) {
     errors.phone = "Required";
-  } else if (!phoneRegex.test(values.phone)) {
+  } else if (!isValidPhone(values.phone)) {
     errors.phone = "Invalid phone number";
   }
 
@@ -64,19 +63,40 @@ const UpdateUser = () => {
     fetchUserData();
   }, [userId]);
 
-  const onSubmit = async (values) => {
-    try {
-      await updateUser(userId, values);
+  // const onSubmit = async (values) => {
+  //   try {
+  //     await updateUser(userId, values);
+  //     toast.success("User updated successfully!", {
+  //       autoClose: 1000,
+  //     });
+  //     navigate(ROUTER.Home);
+  //   } catch (error) {
+  //     console.error("Error updating user:", error);
+  //     toast.error("Error updating user. Please try again.", {
+  //       autoClose: 1000,
+  //     });
+  //   }
+  // };
+
+  const { mutate, loading } = useMutate({
+    requestFn: (values) => updateUser(userId, values),
+    onSuccess: () => {
       toast.success("User updated successfully!", {
         autoClose: 1000,
       });
-      navigate(ROUTER.Home);
-    } catch (error) {
-      console.error("Error updating user:", error);
+      setTimeout(() => {
+        navigate(ROUTER.Home);
+      }, 1250);
+    },
+    onError: (err) => {
+      console.error("Error updating user:", err);
       toast.error("Error updating user. Please try again.", {
         autoClose: 1000,
       });
-    }
+    },
+  });
+  const onSubmit = (values) => {
+    mutate(values);
   };
 
   const formik = useFormik({
@@ -171,9 +191,9 @@ const UpdateUser = () => {
         <button
           className="btn btn-primary rounded my-3 px-5 py-2 fs-5 "
           type="submit"
-          disabled={disableBtn}
+          disabled={disableBtn || loading} // Disable the button while loading
         >
-          Edit User
+          {loading ? "Updating User..." : "Edit User"}
         </button>
       </form>
     </div>

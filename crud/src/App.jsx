@@ -6,10 +6,19 @@ import AddUser from "./components/AddUser";
 import Detail from "./components/Detail";
 import NotFound from "./components/NotFound";
 import UpdateUser from "./components/UpdateUser";
+import { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import moment from "moment";
+import "./helper/momentData";
 
 function App() {
+  useEffect(() => {
+    moment.locale("en");
+    return () => {
+      moment.locale();
+    };
+  }, []);
   return (
     <>
       <NavBar />
